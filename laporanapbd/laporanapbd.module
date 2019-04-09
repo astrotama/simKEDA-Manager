@@ -1,0 +1,251 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_perm().
+ */
+//onModuleCreationWizard
+function laporanapbd_perm() {
+    return array(
+        'access laporan content',
+		'access laporan laporan'
+	);
+} 
+
+/** 
+ * Implementation of hook_menu().
+ */
+
+function laporanapbd_menu() {
+
+
+	$items['laporanapbd'] = array (
+      'title' => 'Penganggaran APBD Tahun 2017/2018',
+	  'description' => 'Penganggaran APBD Tahun 2017/2018',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanapbd_display'] = array (
+      'title' => 'Penganggaran APBD Tahun 2017/2018',
+	  'description' => 'Penganggaran APBD Tahun 2017/2018',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_display_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_display_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanapbdstd'] = array (
+      'title' => 'Penganggaran APBD Tahun 2017/2018',
+	  'description' => 'Penganggaran APBD Tahun 2017/2018',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_std_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_std_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanapbdperiode'] = array (
+      'title' => 'Penganggaran APBD Tahun 2017/2018',
+	  'description' => 'Penganggaran APBD Tahun 2017/2018',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_periode_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_periode_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanapbdperubahan'] = array (
+      'title' => 'Penganggaran APBD Tahun 2017/2018',
+	  'description' => 'Penganggaran APBD Tahun 2017/2018',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_perubahan_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_perubahan_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanapbdpenetapan'] = array (
+      'title' => 'Penganggaran APBD Tahun 2017/2018',
+	  'description' => 'Penganggaran APBD Tahun 2017/2018',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_penetapan_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_penetapan_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+
+	$items['laporanapbdskpd'] = array (
+      'title' => 'laporan Penganggaran per SKPD',
+	  'description' => 'Laporan Penganggaran per SKPD',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbduk_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbduk_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );	
+
+    $items['laporanapbddetil'] = array (
+      'title' => 'Laporan Penganggaran per Obyek/Rekening',
+	  'description' => 'Laporan Penganggaran per Obyek/Rekening',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_detil_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_detil_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    $items['laporanapbddetiluk'] = array (
+      'title' => 'Laporan Penganggaran per SKPD',
+	  'description' => 'Laporan Penganggaran per SKPD',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_detiluk_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_detiluk_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	$items['laporanapbddetilkeg'] = array (
+      'title' => 'Laporan Kegiatan',
+	  'description' => 'Laporan Kegiatan',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_keg_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_keg_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+
+	$items['laporanapbdstd'] = array (
+      'title' => 'Laporan STD',
+	  'description' => 'Laporan STD',
+	  //'title callback' => 'laporanapbd_title_callback',	  
+      'page callback' => 'laporanapbd_std_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'weight' => 11,
+      'file' => 'laporanapbd_std_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+    return $items;
+}
+
+function read_pendapatan_lalu($kodeuk, $kodeakun) {
+
+$agglalu = 0;
+
+db_set_active('akuntansilalu');
+if ($kodeuk=='ZZ') {
+	if (strlen($kodeakun)==1)
+		$results = db_query('select sum(jumlah) as anggaran from {anggperuk} where kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+	elseif (strlen($kodeakun)==2)
+		$results = db_query('select sum(jumlah) as anggaran from {anggperuk} where kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+	elseif (strlen($kodeakun)==3)
+		$results = db_query('select sum(jumlah) as anggaran from {anggperuk} where kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+	else
+		$results = db_query('select sum(jumlah) as anggaran from {anggperuk} where kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+
+} else {
+	if (strlen($kodeakun)==1)
+		$results = db_query('select sum(jumlah) as anggaran from {anggperuk} where kodero like :kodeakun and kodeuk=:kodeuk', array(':kodeakun'=>$kodeakun . '%', ':kodeuk'=>$kodeuk));	
+	elseif (strlen($kodeakun)==2)
+		$results = db_query('select sum(jumlah) as anggaran from {anggperuk} where kodero like :kodeakun and kodeuk=:kodeuk', array(':kodeakun'=>$kodeakun . '%', ':kodeuk'=>$kodeuk));	
+	elseif (strlen($kodeakun)==3)
+		$results = db_query('select sum(jumlah) as anggaran from {anggperuk} where kodero like :kodeakun and kodeuk=:kodeuk', array(':kodeakun'=>$kodeakun . '%', ':kodeuk'=>$kodeuk));	
+	else
+		$results = db_query('select sum(jumlah) as anggaran from {anggperuk} where kodero like :kodeakun and kodeuk=:kodeuk', array(':kodeakun'=>$kodeakun . '%', ':kodeuk'=>$kodeuk));	
+	
+}	
+
+
+foreach ($results as $data_rea) {
+	$agglalu = $data_rea->anggaran;
+}
+
+db_set_active();
+
+return 	$agglalu;
+}
+
+function read_belanja_lalu($kodeuk, $kodeakun) {
+
+$agglalu = 0;
+
+db_set_active('akuntansilalu');
+
+if ($kodeuk=='ZZ') {
+	if (strlen($kodeakun)==1)
+		$results = db_query('select sum(a.jumlah) as anggaran from {anggperkeg} a inner join {kegiatanskpd} k on a.kodekeg=k.kodekeg where k.inaktif=0 and a.kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+
+	elseif (strlen($kodeakun)==2)
+		$results = db_query('select sum(a.jumlah) as anggaran from {anggperkeg} a inner join {kegiatanskpd} k on a.kodekeg=k.kodekeg where k.inaktif=0 and a.kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+	elseif (strlen($kodeakun)==3)
+		$results = db_query('select sum(a.jumlah) as anggaran from {anggperkeg} a inner join {kegiatanskpd} k on a.kodekeg=k.kodekeg where k.inaktif=0 and a.kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+	else
+		$results = db_query('select sum(a.jumlah) as anggaran from {anggperkeg} a inner join {rincianobyek} r on a.kodero=r.kodero inner join {kegiatanskpd} k on a.kodekeg=k.kodekeg where k.inaktif=0 and a.kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+
+} else {
+	if (strlen($kodeakun)==1)
+		$results = db_query('select sum(a.jumlah) as anggaran from {anggperkeg} a inner join  {kegiatanskpd} k on a.kodekeg=k.kodekeg where k.inaktif=0 and a.kodero like :kodeakun and k.kodeuk=:kodeuk', array(':kodeakun'=>$kodeakun . '%', ':kodeuk'=>$kodeuk));	
+
+	elseif (strlen($kodeakun)==2)
+		$results = db_query('select sum(a.jumlah) as anggaran from {anggperkeg} a inner join {kegiatanskpd} k on a.kodekeg=k.kodekeg where k.inaktif=0 and a.kodero like :kodeakun and k.kodeuk=:kodeuk', array(':kodeakun'=>$kodeakun . '%', ':kodeuk'=>$kodeuk));	
+	elseif (strlen($kodeakun)==3)
+		$results = db_query('select sum(a.jumlah) as anggaran from {anggperkeg} a inner join {kegiatanskpd} k on a.kodekeg=k.kodekeg where k.inaktif=0 and a.kodero like :kodeakun and k.kodeuk=:kodeuk', array(':kodeakun'=>$kodeakun . '%', ':kodeuk'=>$kodeuk));	
+	else
+		$results = db_query('select sum(a.jumlah) as anggaran from {anggperkeg} a inner join {rincianobyek} r on a.kodero=r.kodero inner join {kegiatanskpd} k on a.kodekeg=k.kodekeg where k.inaktif=0 and a.kodero like :kodeakun and k.kodeuk=:kodeuk', array(':kodeakun'=>$kodeakun . '%', ':kodeuk'=>$kodeuk));	
+	
+}
+foreach ($results as $data_rea) {
+	$agglalu = $data_rea->anggaran;
+}
+
+db_set_active();
+
+return 	$agglalu;
+}
+
+function read_pembiayaan_lalu($kodeakun) {
+
+$agglalu = 0;
+
+db_set_active('akuntansilalu');
+
+if (strlen($kodeakun)==1)
+	$results = db_query('select sum(jumlah) as anggaran from {anggperda} where kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+elseif (strlen($kodeakun)==2)
+	$results = db_query('select sum(jumlah) as anggaran from {anggperda} where kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+elseif (strlen($kodeakun)==3)
+	$results = db_query('select sum(jumlah) as anggaran from {anggperda} where kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+else
+	$results = db_query('select sum(jumlah) as anggaran from {anggperda} where kodero like :kodeakun', array(':kodeakun'=>$kodeakun . '%'));	
+
+foreach ($results as $data_rea) {
+	$agglalu = $data_rea->anggaran;
+}
+
+db_set_active();
+
+return 	$agglalu;
+}
+
+
+
+?>

@@ -1,0 +1,1345 @@
+<?php
+
+function apbd_menu() {
+
+
+	$items['carikeg'] = array (
+	  //'title callback' => 'laporan_title_callback',	  
+      'page callback' => 'cari_kegiatan_main',
+      //'access arguments' => array ('access content'),
+	  'access callback' => 'user_is_logged_in',
+      'file' => 'cari_kegiatan_main.php',
+      'type' => MENU_NORMAL_ITEM,
+    );
+	
+	$items['apbd/chart'] = array (
+	  'title' => 'Analisis',
+      'page callback' => 'apbd_chart_main',
+      'page arguments' => array('apbd_chart_main'),
+      'access callback' => 'user_is_logged_in',
+      'file' => 'apbd_chart_main.php',
+      'type' => MENU_CALLBACK,
+	  
+    );
+	$items['apbd/chartfront'] = array (
+	  'title' => 'Analisis',
+      'page callback' => 'apbd_chartfront_main',
+      'page arguments' => array('apbd_chartfront_main'),
+      'access callback' => 'user_is_logged_in',
+      'file' => 'apbd_chartfront_main.php',
+      'type' => MENU_CALLBACK,
+	  
+    );
+
+	$items['importkeuangan'] = array (
+	  'title' => 'Import Keuangan',
+      'page callback' => 'import_edit_main',
+      'page arguments' => array('import_edit_main'),
+      'access callback' => 'user_is_logged_in',
+      'file' => 'import_edit_main.php',
+      'type' => MENU_CALLBACK,
+	  
+    );
+
+    return $items;
+}
+
+
+function print_pdf_l($output) {
+	 
+	 $pdf=apbd_pdfd7($output,'L','cek','Pemerintah Kabupaten Jepara ');
+		$title = 'abc.pdf';
+		header('Content-Type: application/pdf');
+		header('Content-Disposition: inline; filename="'.$title.'"');
+		header('Content-Transfer-Encoding: binary');
+		header('Content-Length: '.filesize($pdf));
+		header('Accept-Ranges: bytes');
+		header('Expires: 0');
+		header('Cache-Control: public, must-revalidate, max-age=0');  
+	  
+	  print $pdf;
+	  return NULL;	
+}
+function print_pdf_p($output) {
+	 
+	 $pdf=apbd_pdfd7($output,'P','simMANAGER','Pemerintah Kabupaten Jepara ');
+		$title = 'abc.pdf';
+		header('Content-Type: application/pdf');
+		header('Content-Disposition: inline; filename="'.$title.'"');
+		header('Content-Transfer-Encoding: binary');
+		header('Content-Length: '.filesize($pdf));
+		header('Accept-Ranges: bytes');
+		header('Expires: 0');
+		header('Cache-Control: public, must-revalidate, max-age=0');  
+	  
+	  print $pdf;
+	  return NULL;	
+}
+
+function apbd_tahun() {
+	return '2019';
+}
+
+function apbd_tahun_lalu() {
+	return '2018';
+}
+
+function apbd_tahun_anggaran() {
+	return '2018/2019';
+}
+
+function apbd_pdfd7($html,$orientation,$header,$footer) {
+  // Get the content we want to convert into pdf.
+  //theme('tcpdf_example_basic_html');
+  $footer=' ';
+  /*
+  header('Content-Type: application/pdf');
+  header('Content-Length: ' . strlen($pdf));
+  //header('Content-Disposition: attachment; filename="mydocument.pdf"');
+  header('Content-Disposition: inline; filename="mydocument.pdf"');
+  // Never make an instance of TCPDF or TCPDFDrupal classes manually.
+  // Use tcpdf_get_instance() instead.
+  */
+	
+	/*
+	$title = 'abc.pdf';
+	header('Content-Type: application/pdf');
+	header('Content-Disposition: inline; filename="'.$title.'"');
+	header('Content-Transfer-Encoding: binary');
+	header('Content-Length: '.filesize($html));
+	header('Accept-Ranges: bytes');
+	header('Expires: 0');
+	header('Cache-Control: public, must-revalidate, max-age=0');  
+	*/
+	
+  $tcpdf = tcpdf_get_instance();
+  /* DrupalInitialize() is an extra method added to TCPDFDrupal that initializes
+  *  some TCPDF variables (like font types), and makes possible to change the
+  *  default header or footer without creating a new class.
+  */
+  $tcpdf->DrupalInitialize(array(
+    'footer' => array(
+      'html' => $footer,
+    ),
+    'header' => array(
+	  'html' => $header,
+    ),
+	'orientation' => $orientation,
+  ));
+  // Insert the content. Note that DrupalInitialize automaticly adds the first
+  // page to the pdf document.
+  $tcpdf->writeHTML($html);
+  //$tcpdf->Output('example_002.pdf', 'S');
+
+  return $tcpdf->Output('abc.pdf', 'S');
+  
+  
+}
+
+function apbd_ExportPDFx($pageOrientation, $pageSize, $htmlContent, $pdfFiel) {
+
+	$path = libraries_get_path('tcpdf');
+	if (($path) && (file_exists($path . '/tcpdf.php'))) {
+		require_once($path . '/tcpdf.php');
+		require_once($path . '/config/lang/eng.php');
+	}
+  	set_time_limit(0);
+	ini_set('memory_limit', '1024M');
+
+	//require_once('libraries/tcpdf/config/lang/eng.php');
+    //require_once('libraries/tcpdf/tcpdf.php');
+
+	class MYPDF extends TCPDF {  
+	   // Page footer
+		public function Footer() {
+			// Position at 15 mm from bottom
+			//$this->SetY(-10);
+			// Set font
+			$this->SetFont('helvetica', 'I', 8);
+			// Page number
+		  //$this->Cell(0, 10, $this->getAliasNumPage().' dari '.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');     
+		  $this->Cell(0,0,$this->PageNo(),'T',0,'R');
+		}      
+	} 
+	
+    $pdf = new MYPDF($pageOrientation, PDF_UNIT, $pageSize, true, 'UTF-8', false);
+    set_time_limit(0);
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('SIPPD');
+    $pdf->SetTitle('PDF Gen');
+    $pdf->SetSubject('PDF Gen');
+    $pdf->SetKeywords('APBD');
+    $pdf->setPrintHeader(false);
+    $pdf->setFooterFont(array('helvetica','', 10));
+    $pdf->setFooterMargin(10);
+	$pdf->setRightMargin(1);
+    //$pdf->setFooterMargin(PDF_MARGIN_FOOTER);	
+	if ($pageOrientation=='L') {
+		$pdf->setHeaderMargin(20);
+		//$pdf->SetMargins(5,20);
+		$pdf->SetMargins(10,20);
+	} else {
+		$pdf->setHeaderMargin(10);
+		$pdf->SetMargins(20,10);
+	}
+	
+	//$pdf->SetMargins(15,15);
+    $pdf->SetAutoPageBreak(true, 11);
+    $pdf->setLanguageArray($l);
+    $pdf->SetFont('helvetica','', 10);
+    $pdf->AddPage();
+    $pdf->writeHTML($htmlContent, true, 0, true, 0);
+	
+	//$ypos = $pdf->GetY();
+	//$pdf->Write(0, $ypos, '', 0, 'L', true, 0, false, false, 0);
+	//$ypos = $ypos-10;
+	//$pdf->Write(0, $ypos, '', 0, 'L', true, 0, false, false, 0);
+	
+	//$pdf->SetY($ypos, true, false);
+	
+	//$pdf->writeHTML($htmlContent, true, 0, true, 0);
+    $pdf->Output($pdfFiel, 'I');
+	
+}
+
+
+function apbd_pdfd7_x($html,$orientation,$header,$footer) {
+  // Get the content we want to convert into pdf.
+  //theme('tcpdf_example_basic_html');
+  /*header('Content-Type: application/pdf');
+  header('Content-Length: ' . strlen($pdf));
+  header('Content-Disposition: attachment; filename="mydocument.pdf"');*/
+  // Never make an instance of TCPDF or TCPDFDrupal classes manually.
+  // Use tcpdf_get_instance() instead.
+  $tcpdf = tcpdf_get_instance();
+  /* DrupalInitialize() is an extra method added to TCPDFDrupal that initializes
+  *  some TCPDF variables (like font types), and makes possible to change the
+  *  default header or footer without creating a new class.
+  */
+  $tcpdf->DrupalInitialize(array(
+    'footer' => array(
+      'html' => $footer,
+    ),
+    'header' => array(
+	  'html' => $header,
+    ),
+	'orientation' => $orientation,
+  ));
+  // Insert the content. Note that DrupalInitialize automaticly adds the first
+  // page to the pdf document.
+  $tcpdf->writeHTML($html);
+  //$tcpdf->Output('example_002.pdf', 'S');
+
+  return $tcpdf->Output('', 'S');
+
+  
+}
+
+function apbd_fn($num) {
+
+    //return number_format((float)$num, 0, ',', '.');
+	$num = (float)$num;
+	if (($num<0) and ($num>-0.05)) $num = 0;
+	
+	$x = number_format($num, 0, ',', '.');
+	if (substr($x,0,1)=='-' ) $x = '('. substr($x,1) . ')';
+	return $x;
+}
+
+function apbd_fn2($num) {
+    $x =  number_format((float)$num, 2, ',', '.');
+	if (substr($x,0,1)=='-' ) $x = '('. substr($x,1) . ')';
+	return $x;
+}
+
+function apbd_fn1($num) {
+    $x= number_format((float)$num, 1, ',', '.');
+	if (substr($x,0,1)=='-' ) $x = '('. substr($x,1) . ')';
+	return $x;
+}
+
+function apbd_fd($dt) {
+	return date('Y/m/d',strtotime($dt));
+}
+
+function apbd_render_image() {
+	return '[bg|{001C4CEE-D7CA-457F-A877-47F3C9DCB669}| 10 | 150 | random |10 | # 000000]';
+}
+
+function apbd_terbilang($x){
+	$t = apbd_terbilangx($x);
+	if ($t == '' || $t == ' ')
+		return '# N.i.h.i.l #';
+	else
+		return '# ' . $t . ' Rupiah #';
+}
+
+function apbd_terbilangx($x){
+  $abil = array("", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas");
+  if ($x < 12)
+    return " " . $abil[$x];
+  elseif ($x < 20)
+    return apbd_terbilangx($x - 10) . "belas";
+  elseif ($x < 100)
+    return apbd_terbilangx($x / 10) . " Puluh" . apbd_terbilangx($x % 10);
+  elseif ($x < 200)
+    return " Seratus" . apbd_terbilangx($x - 100);
+  elseif ($x < 1000)
+    return apbd_terbilangx($x / 100) . " Ratus" . apbd_terbilangx($x % 100);
+  elseif ($x < 2000)
+    return " Seribu" . apbd_terbilangx($x - 1000);
+  elseif ($x < 1000000)
+    return apbd_terbilangx($x / 1000) . " Ribu" . apbd_terbilangx($x % 1000);
+  elseif ($x < 1000000000)
+    return apbd_terbilangx($x / 1000000) . " Juta" . apbd_terbilangx($x % 1000000);
+  elseif ($x < 1000000000000)
+    return apbd_terbilangx($x / 1000000000) . " Milyar" . apbd_terbilangx($x % 1000000000);
+}
+
+function apbd_format_rek_obyek($rek) {
+	return substr_replace($rek, '.', 3, 0);
+}
+
+function apbd_format_rek_rincianobyek($rek) {
+	$x = substr_replace($rek, '.', 5, 0);
+	return substr_replace($x, '.', 3, 0);
+}
+
+function apbd_getuseruk() {
+	$user =  user_load($GLOBALS['user']->uid);
+	
+	$pquery = sprintf("select kodeuk from apbdop where username='%s'", $user->name);
+	$pres = db_query($pquery);
+	if ($data=db_fetch_object($pres)) {
+		return $data->kodeuk;
+	}
+	return '';
+}
+
+function apbd_hitungpersen($anggaran, $realisasi){
+	if (($anggaran == 0) or ($anggaran < 0.25))
+		if ($realisasi == 0) 	
+			$x = 0;
+		else 
+			$x = 100;
+		
+	else
+		$x = round(($realisasi/$anggaran)*100,2);
+	
+	return $x;
+}
+
+function apbd_hitungpersen_naikturun($lama, $baru){
+	if ($lama < 0) 
+		$x = round((($baru-$lama)/$lama)*100,2);
+	
+	elseif (($lama == 0) or ($lama < 0.25))
+		if ($baru == 0) 	
+			$x = 0;
+		else if ($baru < 0)
+			$x = -100;
+		else
+			$x = 100;
+		
+	else
+		$x = round((($baru-$lama)/$lama)*100,2);
+	
+	return $x;
+}
+
+function apbd_fn_persen_naikturun($num) {
+    $x= number_format((float)$num, 1, ',', '.');
+	if (substr($x,0,1)=='-' ) $x = '('. substr($x,1) . ')';
+	
+	if ($num < 0)
+		return '<p style="text-align:right; color:red;">' . $x . '</p>';
+	if ($num > 0)
+		return '<p style="text-align:right; color:blue;">' . $x . '</p>';
+	else
+		return '<p style="text-align:right;">' . $x . '</p>';
+	
+}
+
+function apbd_fn_persen_naikturun_bold($num) {
+    $x= number_format((float)$num, 1, ',', '.');
+	if (substr($x,0,1)=='-' ) $x = '('. substr($x,1) . ')';
+	
+	if ($num < 0)
+		return '<p style="text-align:right; color:red; font-weight:bold">' . $x . '</p>';
+	if ($num > 0)
+		return '<p style="text-align:right; color:blue; font-weight:bold">' . $x . '</p>';
+	else
+		return '<p style="text-align:right;  font-weight:bold">' . $x . '</p>';
+	
+}
+
+function apbd_simbol_naikturun($num) {
+	if ($num < 0)
+		return '<span style="text-align:center; color:red;">' . _bootstrap_icon('menu-down') . '</span>';
+	elseif ($num > 0)
+		return '<span style="text-align:center; color:blue;">' . _bootstrap_icon('menu-up') . '</span>';
+	else
+		return '<span style="text-align:center;">' . _bootstrap_icon('option-horizontal') . '</span>';
+	
+}
+
+function apbd_simbol_perencanaan($ppas, $apbd) {
+	$ppas_x = (double) $ppas;
+	$apbd_x = (double) $apbd;
+	
+	if ($ppas_x == $apbd_x)
+		return '<span style="text-align:center; color:green;">' . _bootstrap_icon('ok-circle') . '</span>';
+	elseif ($ppas_x < $apbd_x)
+		return '<span style="text-align:center; color:orange;">' . _bootstrap_icon('exclamation-sign') . '</span>';
+	else
+		return '<span style="text-align:center; color:red;">' . _bootstrap_icon('remove-circle') . '</span>';
+	
+}
+
+function apbd_get_dbvalue($val){
+	$x = round((real) $val,0);
+	return $x;
+}
+
+function apbd_fn_naikturun($num) {
+    $x= number_format((float)$num, 0, ',', '.');
+	if (substr($x,0,1)=='-' ) $x = '('. substr($x,1) . ')';
+	
+	if ($num < 0)
+		return '<p style="text-align:right; color:red;">' . $x . '</p>';
+	if ($num > 0)
+		return '<p style="text-align:right; color:blue;">' . $x . '</p>';
+	else
+		return '<p style="text-align:right;">' . $x . '</p>';
+	
+}
+
+function apbd_fn_naikturun_bold($num) {
+    $x= number_format((float)$num, 0, ',', '.');
+	if (substr($x,0,1)=='-' ) $x = '('. substr($x,1) . ')';
+	
+	if ($num < 0)
+		return '<p style="text-align:right; color:red; font-weight:bold">' . $x . '</p>';
+	if ($num > 0)
+		return '<p style="text-align:right; color:blue; font-weight:bold">' . $x . '</p>';
+	else
+		return '<p style="text-align:right;  font-weight:bold">' . $x . '</p>';
+	
+}
+function isSuperuser() {
+	$user =  user_load($GLOBALS['user']->uid);
+	if (in_array('apbd admin', $user->roles))
+		return true;
+	return (false || isAdministrator());	
+}
+
+function isAdministrator() {
+	$user =  user_load($GLOBALS['user']->uid);
+	if (user_access('Administer Nodes', $user))
+		return true;
+	return false;		
+}
+
+function apbd_ExportPDF($pageOrientation, $pageSize, $htmlContent, $pdfFiel) {
+    require_once('files/tcpdf/config/lang/eng.php');
+    require_once('files/tcpdf/tcpdf.php');
+
+	class MYPDF extends TCPDF {  
+	   // Page footer
+		public function Footer() {
+			// Position at 15 mm from bottom
+			//$this->SetY(-10);
+			// Set font
+			$this->SetFont('helvetica', 'I', 8);
+			// Page number
+		  //$this->Cell(0, 10, $this->getAliasNumPage().' dari '.$this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');     
+		  $this->Cell(0,0,$this->PageNo(),'T',0,'R');
+		}      
+	} 
+	
+    $pdf = new MYPDF($pageOrientation, PDF_UNIT, $pageSize, true, 'UTF-8', false);
+    set_time_limit(0);
+    $pdf->SetCreator(PDF_CREATOR);
+    $pdf->SetAuthor('SIPPD');
+    $pdf->SetTitle('PDF Gen');
+    $pdf->SetSubject('PDF Gen');
+    $pdf->SetKeywords('APBD');
+    $pdf->setPrintHeader(false);
+    $pdf->setFooterFont(array('helvetica','', 10));
+    $pdf->setFooterMargin(10);
+	$pdf->setRightMargin(1);
+    //$pdf->setFooterMargin(PDF_MARGIN_FOOTER);	
+	if ($pageOrientation=='L') {
+		$pdf->setHeaderMargin(20);
+		//$pdf->SetMargins(5,20);
+		$pdf->SetMargins(10,20);
+	} else {
+		$pdf->setHeaderMargin(10);
+		$pdf->SetMargins(20,10);
+	}
+	
+	//$pdf->SetMargins(15,15);
+    $pdf->SetAutoPageBreak(true, 11);
+    $pdf->setLanguageArray($l);
+    $pdf->SetFont('helvetica','', 10);
+    $pdf->AddPage();
+    $pdf->writeHTML($htmlContent, true, 0, true, 0);
+	
+	//$ypos = $pdf->GetY();
+	//$pdf->Write(0, $ypos, '', 0, 'L', true, 0, false, false, 0);
+	//$ypos = $ypos-10;
+	//$pdf->Write(0, $ypos, '', 0, 'L', true, 0, false, false, 0);
+	
+	//$pdf->SetY($ypos, true, false);
+	
+	//$pdf->writeHTML($htmlContent, true, 0, true, 0);
+    $pdf->Output($pdfFiel, 'I');
+	
+}
+
+function apbd_cron() {
+
+}
+
+function apbd_messagebox($message) {
+  $commands = array();
+  $commands[] = ajax_command_alert($message);
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+ 
+function apbd_format_tanggal_pendek($sp2dtgl) {
+	$arrtgl=explode('-',$sp2dtgl);
+	//$bulanoption=array('Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember');
+	return $arrtgl[2].'-'.$arrtgl[1].'-'.$arrtgl[0];	
+}
+
+function apbd_get_namabulan($bulan) {
+
+	switch ($bulan) {
+		case 1:
+			$x = 'Januari';
+			break;
+		case 2:
+			$x = 'Februari';
+			break;
+		case 3:
+			$x = 'Maret';
+			break;
+		case 4:
+			$x = 'April';
+			break;
+		case 5:
+			$x = 'Mei';
+			break;
+		case 6:
+			$x = 'Juni';
+			break;
+		case 7:
+			$x = 'Juli';
+			break;
+		case 8:
+			$x = 'Agustus';
+			break;
+		case 9:
+			$x = 'September';
+			break;
+		case 10:
+			$x = 'Oktober';
+			break;
+		case 11:
+			$x = 'November';
+			break;
+		case 12:
+			$x = 'Desember';
+			break;
+	}
+
+	return $x;
+	
+} 
+
+function apbd_get_namabulan_singkat($bulan) {
+
+	switch ($bulan) {
+		case 1:
+			$x = 'Jan';
+			break;
+		case 2:
+			$x = 'Feb';
+			break;
+		case 3:
+			$x = 'Mar';
+			break;
+		case 4:
+			$x = 'Apr';
+			break;
+		case 5:
+			$x = 'Mei';
+			break;
+		case 6:
+			$x = 'Jun';
+			break;
+		case 7:
+			$x = 'Jul';
+			break;
+		case 8:
+			$x = 'Ags';
+			break;
+		case 9:
+			$x = 'Sep';
+			break;
+		case 10:
+			$x = 'Okt';
+			break;
+		case 11:
+			$x = 'Nov';
+			break;
+		case 12:
+			$x = 'Des';
+			break;
+	}
+
+	return $x;
+	
+} 
+
+
+function apbd_button_print($link) {
+	return l('<span class="glyphicon glyphicon-print" aria-hidden="true"></span> Cetak', $link , array ('html' => true, 'attributes'=> array ('class'=>'btn btn-primary')));
+}
+
+function apbd_button_excel($link) {
+	return l('<span class="glyphicon glyphicon-list" aria-hidden="true"></span> Excel', $link ,array ('html' => true, 'attributes'=> array ('class'=>'btn btn-primary')));
+}
+
+function apbd_button_bukubesar($link) {
+	return l('Buku Besar', $link, array ('html' => true, 'attributes'=> array ('class'=>'btn btn-success btn-xs btn-block')));
+}
+
+function apbd_button_jurnal($link) {
+	return l('Jurnal', $link, array ('html' => true, 'attributes'=> array ('class'=>'btn btn-success btn-xs btn-block')));
+}
+
+function apbd_button_kegiatan($link) {
+	return l('Kegiatan', $link, array ('html' => true, 'attributes'=> array ('class'=>'btn btn-success btn-xs btn-block')));
+}
+
+function apbd_button_register($link) {
+	return l('Register', $link, array ('html' => true, 'attributes'=> array ('class'=>'btn btn-warning btn-xs btn-block')));;
+}
+
+function apbd_button_sp2d($link) {
+	return l('SP2D', $link, array ('html' => true, 'attributes'=> array ('class'=>'btn btn-warning btn-xs btn-block')));
+
+}
+
+function apbd_button_analisis($link) {
+	return l('Analisis', $link, array ('html' => true, 'attributes'=> array ('class'=>'btn btn-info btn-xs btn-block')));
+}
+
+function apbd_button_chart($link) {
+	return l('<span class="glyphicon glyphicon-stats" aria-hidden="true"></span> Analisis', $link , array ('html' => true, 'attributes'=> array ('class'=>'btn btn-danger pull-right')));
+}
+function apbd_button_tampilkan() {
+	return t('<span class="glyphicon glyphicon-search" aria-hidden="true"></span>Tampilkan');
+}
+
+function apbd_chart_utama_all() {
+
+//READ DATA
+//PENDAPATAN DAN BELANJA
+$arr_pendapatan_kum = array();
+$arr_belanja_kum = array();
+$arr_pendapatan_agg = array();
+$arr_belanja_agg = array();
+
+$query = db_select('apbdrekap', 'a');
+$query->fields('a', array('kodeakun'));
+$query->addExpression('SUM(anggaran2/1000)', 'anggaran');
+$query->addExpression('SUM(realisasikum1/1000)', 'bulan1');
+$query->addExpression('SUM(realisasikum2/1000)', 'bulan2');
+$query->addExpression('SUM(realisasikum3/1000)', 'bulan3');
+$query->addExpression('SUM(realisasikum4/1000)', 'bulan4');
+$query->addExpression('SUM(realisasikum5/1000)', 'bulan5');
+$query->addExpression('SUM(realisasikum6/1000)', 'bulan6');
+$query->addExpression('SUM(realisasikum7/1000)', 'bulan7');
+$query->addExpression('SUM(realisasikum8/1000)', 'bulan8');
+$query->addExpression('SUM(realisasikum9/1000)', 'bulan9');
+$query->addExpression('SUM(realisasikum10/1000)', 'bulan10');
+$query->addExpression('SUM(realisasikum11/1000)', 'bulan11');
+$query->addExpression('SUM(realisasikum12/1000)', 'bulan12');
+$query->condition('a.kodeakun', '6', '<>');
+$query->groupBy('a.kodeakun');
+$results = $query->execute();
+
+foreach ($results as $datas) {
+	$k1 = apbd_get_dbvalue($datas->bulan1); $k2 = apbd_get_dbvalue($datas->bulan2);
+	$k3 = apbd_get_dbvalue($datas->bulan3); $k4 = apbd_get_dbvalue($datas->bulan4);
+	$k5 = apbd_get_dbvalue($datas->bulan5); $k6 = apbd_get_dbvalue($datas->bulan6);
+	$k7 = apbd_get_dbvalue($datas->bulan7); $k8 = apbd_get_dbvalue($datas->bulan8);
+	$k9 = apbd_get_dbvalue($datas->bulan9); $k10 = apbd_get_dbvalue($datas->bulan10);
+	$k11 = apbd_get_dbvalue($datas->bulan11); $k12 = apbd_get_dbvalue($datas->bulan12);
+
+	switch ($datas->kodeakun) {
+		case "4":
+			$arr_pendapatan_agg = array(array(1, (real)$datas->anggaran), array(2, (real)$datas->anggaran),
+						array(3, (real)$datas->anggaran), array(4, (real)$datas->anggaran),			
+						array(5, (real)$datas->anggaran), array(6, (real)$datas->anggaran),
+						array(7, (real)$datas->anggaran), array(8, (real)$datas->anggaran),
+						array(9, (real)$datas->anggaran), array(10, (real)$datas->anggaran),
+						array(11, (real)$datas->anggaran), array(12, (real)$datas->anggaran));
+			$arr_pendapatan_kum = array(array(1, $k1), array(2, $k2), array(3, $k3), 
+						array(4, $k4), array(5, $k5), array(6, $k6), array(7, $k7), 
+						array(8, $k8), array(9, $k9), array(10, $k10), array(11, $k11), 
+						array(12, $k12));						
+			break;
+			
+		case "5":
+			$arr_belanja_agg = array(array(1, (real)$datas->anggaran), array(2, (real)$datas->anggaran),
+						array(3, (real)$datas->anggaran), array(4, (real)$datas->anggaran),			
+						array(5, (real)$datas->anggaran), array(6, (real)$datas->anggaran),
+						array(7, (real)$datas->anggaran), array(8, (real)$datas->anggaran),
+						array(9, (real)$datas->anggaran), array(10, (real)$datas->anggaran),
+						array(11, (real)$datas->anggaran), array(12, (real)$datas->anggaran));
+			$arr_belanja_kum = array(array(1, $k1), array(2, $k2), array(3, $k3), 
+						array(4, $k4), array(5, $k5), array(6, $k6), array(7, $k7), 
+						array(8, $k8), array(9, $k9), array(10, $k10), array(11, $k11), 
+						array(12, $k12));						
+			break;
+	}
+
+}	//foreach ($results as $datas)
+
+//PEMBIAYAAN
+$arr_penerimaan_kum = array();
+$arr_pengeluaran_kum = array();
+$arr_penerimaan_agg = array();
+$arr_pengeluaran_agg = array();
+
+$query = db_select('apbdrekap', 'a');
+$query->fields('a', array('kodekelompok'));
+$query->addExpression('SUM(anggaran2/1000)', 'anggaran');
+$query->addExpression('SUM(realisasikum1/1000)', 'bulan1');
+$query->addExpression('SUM(realisasikum2/1000)', 'bulan2');
+$query->addExpression('SUM(realisasikum3/1000)', 'bulan3');
+$query->addExpression('SUM(realisasikum4/1000)', 'bulan4');
+$query->addExpression('SUM(realisasikum5/1000)', 'bulan5');
+$query->addExpression('SUM(realisasikum6/1000)', 'bulan6');
+$query->addExpression('SUM(realisasikum7/1000)', 'bulan7');
+$query->addExpression('SUM(realisasikum8/1000)', 'bulan8');
+$query->addExpression('SUM(realisasikum9/1000)', 'bulan9');
+$query->addExpression('SUM(realisasikum10/1000)', 'bulan10');
+$query->addExpression('SUM(realisasikum11/1000)', 'bulan11');
+$query->addExpression('SUM(realisasikum12/1000)', 'bulan12');
+$query->condition('a.kodeakun', '6', '=');
+$query->groupBy('a.kodekelompok');
+$results = $query->execute();
+foreach ($results as $datas) {
+	$k1 = apbd_get_dbvalue($datas->bulan1); $k2 = apbd_get_dbvalue($datas->bulan2);
+	$k3 = apbd_get_dbvalue($datas->bulan3); $k4 = apbd_get_dbvalue($datas->bulan4);
+	$k5 = apbd_get_dbvalue($datas->bulan5); $k6 = apbd_get_dbvalue($datas->bulan6);
+	$k7 = apbd_get_dbvalue($datas->bulan7); $k8 = apbd_get_dbvalue($datas->bulan8);
+	$k9 = apbd_get_dbvalue($datas->bulan9); $k10 = apbd_get_dbvalue($datas->bulan10);
+	$k11 = apbd_get_dbvalue($datas->bulan11); $k12 = apbd_get_dbvalue($datas->bulan12);
+
+	switch ($datas->kodekelompok) {
+		case "61":
+			$arr_penerimaan_agg = array(array(1, (real)$datas->anggaran), array(2, (real)$datas->anggaran),
+						array(3, (real)$datas->anggaran), array(4, (real)$datas->anggaran),			
+						array(5, (real)$datas->anggaran), array(6, (real)$datas->anggaran),
+						array(7, (real)$datas->anggaran), array(8, (real)$datas->anggaran),
+						array(9, (real)$datas->anggaran), array(10, (real)$datas->anggaran),
+						array(11, (real)$datas->anggaran), array(12, (real)$datas->anggaran));
+			$arr_penerimaan_kum = array(array(1, $k1), array(2, $k2), array(3, $k3), 
+						array(4, $k4), array(5, $k5), array(6, $k6), array(7, $k7), 
+						array(8, $k8), array(9, $k9), array(10, $k10), array(11, $k11), 
+						array(12, $k12));
+						
+			break;
+		case "62":
+			$arr_pengeluaran_agg = array(array(1, (real)$datas->anggaran), array(2, (real)$datas->anggaran),
+						array(3, (real)$datas->anggaran), array(4, (real)$datas->anggaran),			
+						array(5, (real)$datas->anggaran), array(6, (real)$datas->anggaran),
+						array(7, (real)$datas->anggaran), array(8, (real)$datas->anggaran),
+						array(9, (real)$datas->anggaran), array(10, (real)$datas->anggaran),
+						array(11, (real)$datas->anggaran), array(12, (real)$datas->anggaran));
+			$arr_pengeluaran_kum = array(array(1, $k1), array(2, $k2), array(3, $k3), 
+						array(4, $k4), array(5, $k5), array(6, $k6), array(7, $k7), 
+						array(8, $k8), array(9, $k9), array(10, $k10), array(11, $k11), 
+						array(12, $k12));
+						
+			break;
+	}
+
+}	//foreach ($results as $datas)
+//END READ DATA
+							
+$arr_anggaran = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+for ($i=0; $i<12; $i++) {
+	$arr_anggaran[$i][1] = $arr_pendapatan_agg[$i][1] + $arr_penerimaan_agg[$i][1]; 
+}
+
+$arr_pendapatan = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+$arr_pendapatan_persen = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+for ($i=0; $i<12; $i++) {
+	$arr_pendapatan[$i][1] = $arr_pendapatan_kum[$i][1] + $arr_penerimaan_kum[$i][1]; 
+	$arr_pendapatan_persen[$i][1] = round(($arr_pendapatan[$i][1] / $arr_anggaran[$i][1]) * 100,2); 
+}
+
+$arr_belanja = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+$arr_belanja_persen = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+for ($i=0; $i<12; $i++) {
+	$arr_belanja[$i][1] = $arr_belanja_kum[$i][1] + $arr_pengeluaran_kum[$i][1]; 
+	$arr_belanja_persen[$i][1] = round(($arr_belanja[$i][1] / $arr_anggaran[$i][1]) * 100,2); 
+}
+								
+
+$chart = array(
+    '#type' => 'chart',
+    '#chart_type' => 'area',	//area
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('RINGKASAN REALISASI APBD TAHUN ' . apbd_tahun()),
+	'#legend_position' => 'bottom',
+	'#colors' => array('#ccffee', '#bbff99', '#ff9980'),
+);
+$chart['anggaran'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Anggaran'),
+	'#data' => $arr_anggaran,
+);
+$chart['pendapatan'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Pendapatan'),
+	'#data' => $arr_pendapatan,
+);
+$chart['belanja'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Belanja'),
+	'#data' => $arr_belanja,
+);
+
+$chart_rupiah['apbd_chart_utama_rupiah'] = $chart;
+
+
+//PERSEN
+$chart_p = array(
+    '#type' => 'chart',
+    '#chart_type' => 'area',	//area
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('PROSENTASE REALISASI APBD TAHUN ' . apbd_tahun()),
+	'#legend_position' => 'bottom',
+	'#colors' => array('#bbff99', '#ff9980'),
+);
+$chart_p['pendapatan'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('% Pendapatan'),
+	'#data' => $arr_pendapatan_persen,
+);
+$chart_p['belanja'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('% Belanja'),
+	'#data' => $arr_belanja_persen,
+);
+
+$chart_persen['apbd_chart_utama_persen'] = $chart_p;
+
+//TABEL
+$header = array (
+	array('data' => 'Bulan','width' => '10px', 'valign'=>'top'),
+	array('data' => 'Pendapatan', 'valign'=>'top'),
+	array('data' => '', 'width' => '15px', 'valign'=>'top'),
+	array('data' => 'Belanja', 'valign'=>'top'),
+	array('data' => '', 'width' => '15px', 'valign'=>'top'),
+);
+
+$rows = array();
+for ($i=0; $i<12; $i++) {
+	
+	$rows[] = array(
+		array('data' => $i+1, 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn($arr_pendapatan[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn1($arr_pendapatan_persen[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn($arr_belanja[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn1($arr_belanja_persen[$i][1]), 'align' => 'right', 'valign'=>'top'),
+	);
+}
+
+$uraian = '<p>Nilai APBD : <strong>' .  apbd_fn($arr_anggaran[0][1]) . '</strong><em>, merupakan jumlah Pendapatan dan Penerimaan Pembiayaan yang setara dengan jumlah Belanja ditambah dengan jumlah Pengeluaran Pembiayaan.</em></p>';
+$output = theme('table', array('header' => $header, 'rows' => $rows ));
+
+return drupal_render($chart_rupiah) . drupal_render($chart_persen) . $uraian . $output;
+//return drupal_render($chart_persen);
+	
+}
+
+function apbd_chart_utama_pendapatan_belanja() {
+
+//READ DATA
+//PENDAPATAN DAN BELANJA
+$arr_pendapatan_kum = array();
+$arr_belanja_kum = array();
+$arr_pendapatan_agg = array();
+$arr_belanja_agg = array();
+
+$query = db_select('apbdrekap', 'a');
+$query->fields('a', array('kodeakun'));
+$query->addExpression('SUM(anggaran2/1000)', 'anggaran');
+$query->addExpression('SUM(realisasikum1/1000)', 'bulan1');
+$query->addExpression('SUM(realisasikum2/1000)', 'bulan2');
+$query->addExpression('SUM(realisasikum3/1000)', 'bulan3');
+$query->addExpression('SUM(realisasikum4/1000)', 'bulan4');
+$query->addExpression('SUM(realisasikum5/1000)', 'bulan5');
+$query->addExpression('SUM(realisasikum6/1000)', 'bulan6');
+$query->addExpression('SUM(realisasikum7/1000)', 'bulan7');
+$query->addExpression('SUM(realisasikum8/1000)', 'bulan8');
+$query->addExpression('SUM(realisasikum9/1000)', 'bulan9');
+$query->addExpression('SUM(realisasikum10/1000)', 'bulan10');
+$query->addExpression('SUM(realisasikum11/1000)', 'bulan11');
+$query->addExpression('SUM(realisasikum12/1000)', 'bulan12');
+$query->condition('a.kodeakun', '6', '<>');
+$query->groupBy('a.kodeakun');
+$results = $query->execute();
+
+foreach ($results as $datas) {
+	$k1 = apbd_get_dbvalue($datas->bulan1); $k2 = apbd_get_dbvalue($datas->bulan2);
+	$k3 = apbd_get_dbvalue($datas->bulan3); $k4 = apbd_get_dbvalue($datas->bulan4);
+	$k5 = apbd_get_dbvalue($datas->bulan5); $k6 = apbd_get_dbvalue($datas->bulan6);
+	$k7 = apbd_get_dbvalue($datas->bulan7); $k8 = apbd_get_dbvalue($datas->bulan8);
+	$k9 = apbd_get_dbvalue($datas->bulan9); $k10 = apbd_get_dbvalue($datas->bulan10);
+	$k11 = apbd_get_dbvalue($datas->bulan11); $k12 = apbd_get_dbvalue($datas->bulan12);
+
+	switch ($datas->kodeakun) {
+		case "4":
+			$arr_pendapatan_agg = array(array(1, (real)$datas->anggaran), array(2, (real)$datas->anggaran),
+						array(3, (real)$datas->anggaran), array(4, (real)$datas->anggaran),			
+						array(5, (real)$datas->anggaran), array(6, (real)$datas->anggaran),
+						array(7, (real)$datas->anggaran), array(8, (real)$datas->anggaran),
+						array(9, (real)$datas->anggaran), array(10, (real)$datas->anggaran),
+						array(11, (real)$datas->anggaran), array(12, (real)$datas->anggaran));
+			$arr_pendapatan_kum = array(array(1, $k1), array(2, $k2), array(3, $k3), 
+						array(4, $k4), array(5, $k5), array(6, $k6), array(7, $k7), 
+						array(8, $k8), array(9, $k9), array(10, $k10), array(11, $k11), 
+						array(12, $k12));						
+			break;
+			
+		case "5":
+			$arr_belanja_agg = array(array(1, (real)$datas->anggaran), array(2, (real)$datas->anggaran),
+						array(3, (real)$datas->anggaran), array(4, (real)$datas->anggaran),			
+						array(5, (real)$datas->anggaran), array(6, (real)$datas->anggaran),
+						array(7, (real)$datas->anggaran), array(8, (real)$datas->anggaran),
+						array(9, (real)$datas->anggaran), array(10, (real)$datas->anggaran),
+						array(11, (real)$datas->anggaran), array(12, (real)$datas->anggaran));
+			$arr_belanja_kum = array(array(1, $k1), array(2, $k2), array(3, $k3), 
+						array(4, $k4), array(5, $k5), array(6, $k6), array(7, $k7), 
+						array(8, $k8), array(9, $k9), array(10, $k10), array(11, $k11), 
+						array(12, $k12));						
+			break;
+	}
+
+}	//foreach ($results as $datas)
+//END READ DATA
+							
+$arr_pendapatan_persen = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+for ($i=0; $i<12; $i++) {
+	$arr_pendapatan_persen[$i][1] = round(($arr_pendapatan_kum[$i][1] / $arr_pendapatan_agg[$i][1]) * 100,2); 
+}
+
+$arr_belanja_persen = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+for ($i=0; $i<12; $i++) {
+	$arr_belanja_persen[$i][1] = round(($arr_belanja_kum[$i][1] / $arr_belanja_agg[$i][1]) * 100,2); 
+}
+								
+
+$chart = array(
+    '#type' => 'chart',
+    '#chart_type' => 'line',	//area
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('RINGKASAN REALISASI PENDAPATAN DAN BELANJA TAHUN ' . apbd_tahun()),
+	'#legend_position' => 'bottom',
+	'#colors' => array('#6fdc6f', '#6fdc6f', '#ff4d4d', '#990000'),
+);
+$chart['pendapatan_a'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Pendapatan [A]'),
+	'#data' => $arr_pendapatan_agg,
+);
+$chart['pendapatan_r'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Pendapatan [R]'),
+	'#data' => $arr_pendapatan_kum,
+);
+
+$chart['belanja_a'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Belanja [A]'),
+	'#data' => $arr_belanja_agg,
+);
+$chart['belanja_r'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Belanja [R]'),
+	'#data' => $arr_belanja_kum,
+);
+
+$chart_rupiah['apbd_chart_utama_pendapatan_belanja_rupiah'] = $chart;
+
+
+//PERSEN
+$chart_p = array(
+    '#type' => 'chart',
+    '#chart_type' => 'area',	//area
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('PROSENTASE REALISASI PENDAPATAN DAN BELANJA TAHUN ' . apbd_tahun()),
+	'#legend_position' => 'bottom',
+	'#colors' => array('#6fdc6f', '#ff704d'),
+);
+$chart_p['pendapatan'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('% Pendapatan'),
+	'#data' => $arr_pendapatan_persen,
+);
+$chart_p['belanja'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('% Belanja'),
+	'#data' => $arr_belanja_persen,
+);
+
+$chart_persen['apbd_chart_utama_pendapatan_belanja_persen'] = $chart_p;
+
+//TABEL
+$header = array (
+	array('data' => 'Bulan','width' => '10px', 'valign'=>'top'),
+	array('data' => 'Pendapatan', 'valign'=>'top'),
+	array('data' => '', 'width' => '15px', 'valign'=>'top'),
+	array('data' => 'Belanja', 'valign'=>'top'),
+	array('data' => '', 'width' => '15px', 'valign'=>'top'),
+);
+
+$rows = array();
+for ($i=0; $i<12; $i++) {
+	
+	$rows[] = array(
+		array('data' => $i+1, 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn($arr_pendapatan_kum[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn1($arr_pendapatan_persen[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn($arr_belanja_kum[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn1($arr_belanja_persen[$i][1]), 'align' => 'right', 'valign'=>'top'),
+	);
+}
+
+$uraian = '<p>Pendapatan : <strong>' .  apbd_fn($arr_pendapatan_agg[0][1]) . '</strong></p>';
+$uraian .= '<p>Belanja : <strong>' .  apbd_fn($arr_belanja_agg[0][1]) . '</strong></p>';
+$output = theme('table', array('header' => $header, 'rows' => $rows ));
+
+return drupal_render($chart_rupiah) . drupal_render($chart_persen) . $uraian . $output;
+//return drupal_render($chart_persen);
+	
+}
+
+function apbd_chart_utama_pembiayaan() {
+
+//READ DATA
+//PENDAPATAN DAN BELANJA
+$arr_penerimaan_kum = array();
+$arr_pengeluaran_kum = array();
+$arr_penerimaan_agg = array();
+$arr_pengeluaran_agg = array();
+
+$query = db_select('apbdrekap', 'a');
+$query->fields('a', array('kodekelompok'));
+$query->addExpression('SUM(anggaran2/1000)', 'anggaran');
+$query->addExpression('SUM(realisasikum1/1000)', 'bulan1');
+$query->addExpression('SUM(realisasikum2/1000)', 'bulan2');
+$query->addExpression('SUM(realisasikum3/1000)', 'bulan3');
+$query->addExpression('SUM(realisasikum4/1000)', 'bulan4');
+$query->addExpression('SUM(realisasikum5/1000)', 'bulan5');
+$query->addExpression('SUM(realisasikum6/1000)', 'bulan6');
+$query->addExpression('SUM(realisasikum7/1000)', 'bulan7');
+$query->addExpression('SUM(realisasikum8/1000)', 'bulan8');
+$query->addExpression('SUM(realisasikum9/1000)', 'bulan9');
+$query->addExpression('SUM(realisasikum10/1000)', 'bulan10');
+$query->addExpression('SUM(realisasikum11/1000)', 'bulan11');
+$query->addExpression('SUM(realisasikum12/1000)', 'bulan12');
+$query->condition('a.kodeakun', '6', '=');
+$query->groupBy('a.kodekelompok');
+$results = $query->execute();
+
+foreach ($results as $datas) {
+	$k1 = apbd_get_dbvalue($datas->bulan1); $k2 = apbd_get_dbvalue($datas->bulan2);
+	$k3 = apbd_get_dbvalue($datas->bulan3); $k4 = apbd_get_dbvalue($datas->bulan4);
+	$k5 = apbd_get_dbvalue($datas->bulan5); $k6 = apbd_get_dbvalue($datas->bulan6);
+	$k7 = apbd_get_dbvalue($datas->bulan7); $k8 = apbd_get_dbvalue($datas->bulan8);
+	$k9 = apbd_get_dbvalue($datas->bulan9); $k10 = apbd_get_dbvalue($datas->bulan10);
+	$k11 = apbd_get_dbvalue($datas->bulan11); $k12 = apbd_get_dbvalue($datas->bulan12);
+
+	switch ($datas->kodekelompok) {
+		case "61":
+			$arr_penerimaan_agg = array(array(1, (real)$datas->anggaran), array(2, (real)$datas->anggaran),
+						array(3, (real)$datas->anggaran), array(4, (real)$datas->anggaran),			
+						array(5, (real)$datas->anggaran), array(6, (real)$datas->anggaran),
+						array(7, (real)$datas->anggaran), array(8, (real)$datas->anggaran),
+						array(9, (real)$datas->anggaran), array(10, (real)$datas->anggaran),
+						array(11, (real)$datas->anggaran), array(12, (real)$datas->anggaran));
+			$arr_penerimaan_kum = array(array(1, $k1), array(2, $k2), array(3, $k3), 
+						array(4, $k4), array(5, $k5), array(6, $k6), array(7, $k7), 
+						array(8, $k8), array(9, $k9), array(10, $k10), array(11, $k11), 
+						array(12, $k12));						
+			break;
+			
+		case "62":
+			$arr_pengeluaran_agg = array(array(1, (real)$datas->anggaran), array(2, (real)$datas->anggaran),
+						array(3, (real)$datas->anggaran), array(4, (real)$datas->anggaran),			
+						array(5, (real)$datas->anggaran), array(6, (real)$datas->anggaran),
+						array(7, (real)$datas->anggaran), array(8, (real)$datas->anggaran),
+						array(9, (real)$datas->anggaran), array(10, (real)$datas->anggaran),
+						array(11, (real)$datas->anggaran), array(12, (real)$datas->anggaran));
+			$arr_pengeluaran_kum = array(array(1, $k1), array(2, $k2), array(3, $k3), 
+						array(4, $k4), array(5, $k5), array(6, $k6), array(7, $k7), 
+						array(8, $k8), array(9, $k9), array(10, $k10), array(11, $k11), 
+						array(12, $k12));						
+			break;
+	}
+
+}	//foreach ($results as $datas)
+//END READ DATA
+							
+$arr_penerimaan_persen = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+for ($i=0; $i<12; $i++) {
+	$arr_penerimaan_persen[$i][1] = round(($arr_penerimaan_kum[$i][1] / $arr_penerimaan_agg[$i][1]) * 100,2); 
+}
+
+$arr_pengeluaran_persen = array(array(1, 0), array(2, 0), array(3, 0), array(4, 0), array(5, 0), array(6, 0),
+			array(7, 0), array(8, 0), array(9, 0), array(10, 0), array(11, 0), array(12, 0));
+for ($i=0; $i<12; $i++) {
+	$arr_pengeluaran_persen[$i][1] = round(($arr_pengeluaran_kum[$i][1] / $arr_pengeluaran_agg[$i][1]) * 100,2); 
+}
+								
+
+$chart = array(
+    '#type' => 'chart',
+    '#chart_type' => 'line',	//area
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('RINGKASAN REALISASI PEMBIAYAAN TAHUN ' . apbd_tahun()),
+	'#legend_position' => 'bottom',
+	'#colors' => array('#66b0ff', '#00254d', '#ffcc80', '#b36b00'),
+);
+$chart['pendapatan_a'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Penerimaan [A]'),
+	'#data' => $arr_penerimaan_agg,
+);
+$chart['pendapatan_r'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Penerimaan [R]'),
+	'#data' => $arr_penerimaan_kum,
+);
+
+$chart['belanja_a'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Pengeluaran [A]'),
+	'#data' => $arr_pengeluaran_agg,
+);
+$chart['belanja_r'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Pengeluaran [R]'),
+	'#data' => $arr_pengeluaran_kum,
+);
+
+$chart_rupiah['apbd_chart_utama_pembiayaan_rupiah'] = $chart;
+
+
+//PERSEN
+$chart_p = array(
+    '#type' => 'chart',
+    '#chart_type' => 'area',	//area
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('PROSENTASE REALISASI PEMBIAYAAN TAHUN ' . apbd_tahun()),
+	'#legend_position' => 'bottom',
+	'#colors' => array('#99caff', '#ffc266'),
+);
+$chart_p['pendapatan'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('% Pendapatan'),
+	'#data' => $arr_penerimaan_persen,
+);
+$chart_p['belanja'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('% Pengeluaran'),
+	'#data' => $arr_pengeluaran_persen,
+);
+
+$chart_persen['apbd_chart_utama_pembiayaan_persen'] = $chart_p;
+
+//TABEL
+$header = array (
+	array('data' => 'Bulan','width' => '10px', 'valign'=>'top'),
+	array('data' => 'Penerimaan', 'valign'=>'top'),
+	array('data' => '', 'width' => '15px', 'valign'=>'top'),
+	array('data' => 'Pengeluaran', 'valign'=>'top'),
+	array('data' => '', 'width' => '15px', 'valign'=>'top'),
+);
+
+$rows = array();
+for ($i=0; $i<12; $i++) {
+	
+	$rows[] = array(
+		array('data' => $i+1, 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn($arr_penerimaan_kum[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn1($arr_penerimaan_persen[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn($arr_pengeluaran_kum[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn1($arr_pengeluaran_persen[$i][1]), 'align' => 'right', 'valign'=>'top'),
+	);
+}
+
+$uraian = '<p>Penerimaan : <strong>' .  apbd_fn($arr_penerimaan_agg[0][1]) . '</strong></p>';
+$uraian .= '<p>Pengeluaran : <strong>' .  apbd_fn($arr_pengeluaran_agg[0][1]) . '</strong></p>';
+$output = theme('table', array('header' => $header, 'rows' => $rows ));
+ 
+return drupal_render($chart_rupiah) . drupal_render($chart_persen) . $uraian .  $output;
+//return drupal_render($chart_persen);
+	
+}
+
+function apbd_chart_utama_kas() {
+$pembagi = 1000;
+
+//ANGGARAN
+$arrA = array(array(1,0),array(2,0),array(3,0),array(4,0),array(5,0),array(6,0),
+			  array(7,0),array(8,0),array(9,0),array(10,0),array(11,0),array(12,0));
+$query = db_select('triwulan', 't');
+$query->fields('t', array('bulan'));
+$query->addExpression('SUM(gaji+pegawai+barangjasa+tanah+mesin+gedung+jaringan+lainya+bunga+subsidi+hibah+bansos+bagihasil+bankeu+ttg)', 'anggaran');
+$query->groupBy('bulan');
+$query->orderBy('bulan', 'ASC');
+$results = $query->execute();
+
+foreach ($results as $data) {
+	$val = round($data->anggaran / $pembagi, 0);
+	
+	for ($bulan=$data->bulan-1; $bulan<=11; $bulan++) {
+		$arrA[$bulan][1] = $arrA[$bulan][1]+$val;
+	}
+
+}
+
+//REALISASI
+$arrR = array(array(1,0),array(2,0),array(3,0),array(4,0),array(5,0),array(6,0),
+			  array(7,0),array(8,0),array(9,0),array(10,0),array(11,0),array(12,0));
+$arrP = array(array(1,0),array(2,0),array(3,0),array(4,0),array(5,0),array(6,0),
+			  array(7,0),array(8,0),array(9,0),array(10,0),array(11,0),array(12,0));
+
+$query = db_select('realisasi', 't');
+$query->fields('t', array('bulan'));
+$query->addExpression('SUM(gaji+pegawai+barangjasa+tanah+mesin+gedung+jaringan+lainya+bunga+subsidi+hibah+bansos+bagihasil+bankeu+ttg)', 'realisasi');
+$query->groupBy('bulan');
+$query->orderBy('bulan', 'ASC');
+$results = $query->execute();
+
+foreach ($results as $data) {
+	$val = round($data->realisasi / $pembagi, 2);
+	
+	for ($bulan=$data->bulan-1; $bulan<=11; $bulan++) {
+		$arrR[$bulan][1] = $arrR[$bulan][1]+$val;
+	}
+	
+}
+
+for ($i=0; $i<12; $i++) {
+	$arrP[$i][1] = round(($arrR[$i][1] / $arrA[$i][1]) * 100,2); 
+}
+
+$chart = array(
+    '#type' => 'chart',
+    '#chart_type' => 'area',	//area
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('RINGKASAN REALISASI ANGGARAN KAS TAHUN 2017'),
+    '#legend_position' => 'bottom',
+	'#colors' => array('#c1f0c1', '#2db92d'),
+);
+$chart['anggaran'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Anggaran'),
+	'#data' => $arrA,
+);
+$chart['realisasi'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('Realisasi'),
+	'#data' => $arrR,
+);
+
+$chart_rupiah['apbd_chart_kas_rupiah'] = $chart;
+
+//PERSEN
+$chart_p = array(
+    '#type' => 'chart',
+    '#chart_type' => 'area',	//area
+    '#chart_library' => 'highcharts', // Allowed values: 'google' or 'highcharts'
+    '#title' => t('PROSENTASE REALISASI ANGGARAN KAS TAHUN 2017'),
+    '#legend_position' => 'bottom',
+	'#colors' => array('#5bd75b'),
+);
+$chart_p['realisasi'] = array(
+	'#type' => 'chart_data',
+	'#title' => t('% Realisasi'),
+	'#data' => $arrP,
+);
+
+//TABEL
+$header = array (
+	array('data' => 'Bulan','width' => '10px', 'valign'=>'top'),
+	array('data' => 'Anggaran', 'valign'=>'top'),
+	array('data' => 'Realisasi', 'valign'=>'top'),
+	array('data' => 'Persen', 'width' => '20px', 'valign'=>'top'),
+);
+
+$rows = array();
+for ($i=0; $i<12; $i++) {
+	
+	$rows[] = array(
+		array('data' => $i+1, 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn($arrA[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn($arrR[$i][1]), 'align' => 'right', 'valign'=>'top'),
+		array('data' => apbd_fn1($arrP[$i][1]), 'align' => 'right', 'valign'=>'top'),
+	);
+}
+
+$output = theme('table', array('header' => $header, 'rows' => $rows ));
+
+$chart_persen['apbd_chart_kas_rupiah'] = $chart_p;
+
+return drupal_render($chart_rupiah) . drupal_render($chart_persen) . $output;
+
+}
+
+function apbd_client_type() {
+$client_type = $_SESSION["client_type"];
+
+if ($client_type=='') {
+	$detect = mobile_detect_get_object();
+	
+    if ($detect->isTablet())
+		$client_type = "t";
+	elseif ($detect->isMobile())
+		$client_type = "m";
+	else
+		$client_type = "d";
+	
+	$_SESSION["client_type"] = $client_type;
+}	
+return $client_type;
+}
+
+function apbd_blank_space() {
+	return '&nbsp;';
+}
+
+function apbd_row_limit() {
+	return 10;
+}

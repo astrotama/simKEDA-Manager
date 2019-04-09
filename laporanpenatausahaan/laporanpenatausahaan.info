@@ -1,0 +1,6 @@
+; $Id$
+name = "Laporan Penatausahaan"
+description = "Sistem Informasi Eksekutif - Laporan Penatausahaan"
+;dependencies[] = 
+core = 7.x
+package="APBD R1"

@@ -1,0 +1,22 @@
+ANGGARAN
+1. Penetapan/Perubahan -> Penetapan
+	- Dalam versi dekstop masih ditampilkan per milyar rupaiah, harusnya tampil apa adanya.
+	
+2. Penetapan/Perubahan -> Perubahan
+	- Dalam versi dekstop masih ditampilkan per milyar rupaiah, harusnya tampil apa adanya.
+	
+REALISASI
+1. Ringkas
+	Kondisi saat ini baik dekstop ato mobile tampil dalam satuan milyar. seharusnya :
+	- Kalo dari dekstop, tampil apa adanya
+	- Kalo dari mobile, tampil dalam satuan milyar
+	
+2. Standar
+	Kondisi saat ini baik dekstop ato mobile tampil adanya. seharusnya :
+	- Kalo dari dekstop, tampil apa adanya
+	- Kalo dari mobile, tampil dalam satuan milyar
+	
+3. KAS
+	Kondisi saat ini baik dekstop ato mobile tampil dalam satuan milyar. seharusnya :
+	- Kalo dari dekstop, tampil apa adanya
+	- Kalo dari mobile, tampil dalam satuan milyar

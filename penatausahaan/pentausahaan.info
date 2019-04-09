@@ -1,0 +1,6 @@
+; $Id$
+name = "Penata Usahaan"
+description = "Penata usahaan"
+;dependencies[] = 
+core = 7.x
+package="APBD R1"
